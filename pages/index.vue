@@ -57,12 +57,12 @@ export default {
   methods: {
     async login() {
       try {
+        // Use runtime config for API base URL
         const {
           public: { apiBase },
         } = useRuntimeConfig();
 
-        // Send login request
-        const response = await useFetch("/api/auth/login", {
+        const { data, error } = await useFetch("/api/auth/login", {
           baseURL: apiBase,
           method: "POST",
           body: {
@@ -71,49 +71,42 @@ export default {
           },
         });
 
-        const { data, error } = response;
-
-        if (error?.value) {
-          // Log server-side or network error
-          console.error("Login error:", error.value.data || error.value);
+        if (error.value) {
           alert(
             "Login failed: " +
-              (error.value.data?.message || error.value.message || "Unknown error")
+              (error.value.data?.message || error.value.message)
           );
           return;
         }
 
-        console.log("Full login response:", data.value);
-
-        // Extract token and user from response
-        const token = data?.value?.token;
-        const user = data?.value?.user;
-
-        if (token && user) {
-          // Save token and user data to local storage or state
+        const token = data.value?.token;
+        if (token) {
           localStorage.setItem("authToken", token);
+
+          // Store user details in global state
+          const user = data.value?.user;
           useState("user").value = user;
+          console.log("User stored in state:", user);
 
-          console.log("Stored user:", user);
-
-          // Redirect based on user role
-          if (user.role === "Admin" || user.role === "Manager") {
+          // Redirect based on role
+          if (user?.role === "Admin" || user?.role === "Manager") {
+            console.log("Redirecting to /dashboard for role:", user.role);
             navigateTo("/dashboard");
-          } else if (user.role === "Viewer") {
+          } else if (user?.role === "Viewer") {
+            console.log("Redirecting to /viewer for role:", user.role);
             navigateTo("/viewer");
           } else {
+            console.error("Unauthorized role:", user?.role);
             alert("Unauthorized role!");
           }
         } else {
-          console.error("Token or user missing in the response.");
-          alert("Unexpected error: Token or user missing in the response.");
+          alert("Token not found in response!");
         }
-      } catch (err) {
-        console.error("Unexpected error during login:", err);
-        alert("An unexpected error occurred during login!");
+      } catch (error) {
+        console.error("Unexpected error during login:", error);
+        alert("An unexpected error occurred!");
       }
     },
   },
 };
 </script>
-
