@@ -1,9 +1,11 @@
 <template>
-  <div>
-    <test />
+  <div class="w-full h-screen bg-black">
+    <Login />
+    <Register />
   </div>
 </template>
 
 <script setup lang="ts">
-import test from './components/test.vue'
+import Login from './components/login.vue'
+import Register from './components/register.vue'  
 </script>
