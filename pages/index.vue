@@ -39,10 +39,6 @@
 </template>
 
 <script>
-import axios from "axios";
-
-axios.defaults.baseURL = "http://localhost:8000";
-
 export default {
   data() {
     return {
@@ -53,15 +49,37 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post("http://localhost:8000/api/auth/login", {
-          email: this.email,
-          password: this.password,
+        // Use the runtime configuration for the base URL
+        const { public: { apiBase } } = useRuntimeConfig();
+
+        const { data, error } = await useFetch('/api/auth/login', {
+          baseURL: apiBase,
+          method: 'POST',
+          body: {
+            email: this.email,
+            password: this.password,
+          },
         });
-        console.log("Login successful:", response.data);
-        alert("Login Successful!");
+
+        if (error.value) {
+          console.error("Login failed:", error.value.data?.message || error.value.message);
+          alert("Login failed!");
+        } else {
+          console.log("Login successful:", data.value);
+
+          // Store token in local storage
+          const token = data.value?.token; // Adjust the key according to your API response
+          if (token) {
+            localStorage.setItem('authToken', token);
+            alert("Login Successful!");
+          } else {
+            console.error("Token not found in the response.");
+            alert("Unexpected error: Token not found.");
+          }
+        }
       } catch (error) {
-        console.error("Login failed:", error.response?.data?.message || error.message);
-        alert("Login failed!");
+        console.error("Unexpected error:", error);
+        alert("Unexpected error occurred!");
       }
     },
   },
