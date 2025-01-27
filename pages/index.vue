@@ -30,8 +30,9 @@
       </form>
       <p class="text-sm text-gray-600 text-center mt-4">
         Don't have an account?
-        <a href="#" class="text-blue-500 hover:underline">Sign up</a>
+        <NuxtLink to="/register" class="text-blue-500 hover:underline">Sign Up</NuxtLink>
       </p>
     </div>
   </div>
 </template>
+
