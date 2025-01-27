@@ -8,7 +8,7 @@
           <input
             type="text"
             id="name"
-            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg"
             placeholder="Enter your full name"
           />
         </div>
@@ -17,7 +17,7 @@
           <input
             type="email"
             id="email"
-            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg"
             placeholder="Enter your email"
           />
         </div>
@@ -26,14 +26,14 @@
           <input
             type="password"
             id="password"
-            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg"
             placeholder="Create a password"
           />
         </div>
         
         <button
           type="submit"
-          class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+          class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-800 transition duration-300"
         >
           Register
         </button>
