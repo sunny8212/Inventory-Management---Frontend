@@ -29,7 +29,7 @@
             placeholder="Enter your password"
           />
         </div>
-        <button
+        <button 
           type="submit"
           class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-800 transition duration-300"
         >
@@ -55,58 +55,61 @@ export default {
     };
   },
   methods: {
-    async login() {
-      try {
-        // Use runtime config for API base URL
-        const {
-          public: { apiBase },
-        } = useRuntimeConfig();
+  async login() {
+    try {
+      // Use runtime config for API base URL
+      const {
+        public: { apiBase },
+      } = useRuntimeConfig();
 
-        const { data, error } = await useFetch("/api/auth/login", {
-          baseURL: apiBase,
-          method: "POST",
-          body: {
-            email: this.email,
-            password: this.password,
-          },
-        });
+      const { data, error } = await useFetch("/api/auth/login", {
+        baseURL: apiBase,
+        method: "POST",
+        body: {
+          email: this.email,
+          password: this.password,
+        },
+      });
 
-        if (error.value) {
-          alert(
-            "Login failed: " +
-              (error.value.data?.message || error.value.message)
-          );
-          return;
-        }
-
-        const token = data.value?.token;
-        if (token) {
-          localStorage.setItem("authToken", token);
-
-          // Store user details in global state
-          const user = data.value?.user;
-          useState("user").value = user;
-          console.log("User stored in state:", user);
-
-          // Redirect based on role
-          if (user?.role === "Admin" || user?.role === "Manager") {
-            console.log("Redirecting to /dashboard for role:", user.role);
-            navigateTo("/dashboard");
-          } else if (user?.role === "Viewer") {
-            console.log("Redirecting to /viewer for role:", user.role);
-            navigateTo("/viewer");
-          } else {
-            console.error("Unauthorized role:", user?.role);
-            alert("Unauthorized role!");
-          }
-        } else {
-          alert("Token not found in response!");
-        }
-      } catch (error) {
-        console.error("Unexpected error during login:", error);
-        alert("An unexpected error occurred!");
+      if (error.value) {
+        alert(
+          "Login failed: " +
+            (error.value.data?.message || error.value.message)
+        );
+        return;
       }
-    },
+
+      const token = data.value?.token;
+      if (token) {
+        localStorage.setItem("authToken", token);
+
+        // Store user details in global state
+        const user = data.value?.user;
+        useState("user").value = user;
+
+        // Ensure that the user details are set before navigating
+        await this.$nextTick(); // Makes sure state is updated before redirect
+
+        // Redirect based on role
+        if (user?.role === "Admin" || user?.role === "Manager") {
+          console.log("Redirecting to /dashboard for role:", user.role);
+          navigateTo("/dashboard");
+        } else if (user?.role === "Viewer") {
+          console.log("Redirecting to /viewer for role:", user.role);
+          navigateTo("/dashboard");
+        } else {
+          console.error("Unauthorized role:", user?.role);
+          alert("Unauthorized role!");
+        }
+      } else {
+        alert("Token not found in response!");
+      }
+    } catch (error) {
+      console.error("Unexpected error during login:", error);
+      alert("An unexpected error occurred!");
+    }
   },
+}
+
 };
 </script>

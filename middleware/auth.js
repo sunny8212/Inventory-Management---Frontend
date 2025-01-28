@@ -12,4 +12,10 @@ export default defineNuxtRouteMiddleware((to, from) => {
     alert('You do not have permission to access this page.');
     return navigateTo('/');
   }
+
+  // Check if user is logged in and has the correct role
+  if (!user || (user.role !== 'Admin' && user.role !== 'Manager' && user.role !== 'Viewer')) {
+    alert('Access denied!');
+    return navigateTo('/'); // Redirect to the home page if unauthorized
+  }
 });
