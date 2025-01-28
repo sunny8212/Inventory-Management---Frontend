@@ -47,7 +47,7 @@
     <div v-else-if="user?.role === 'Viewer'" class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6">
       <h3 class="text-2xl font-semibold text-gray-700 mb-4">Viewer Section</h3>
       <p class="text-lg text-gray-700 mb-4">You have view-only access to resources.</p>
-      <button class="w-full sm:w-auto bg-gray-500 text-white py-2 px-4 rounded-lg shadow-md cursor-not-allowed" disabled>View Reports</button>
+      <button @click="showReports = true" class="w-full sm:w-auto bg-gray-500 text-white py-2 px-4 rounded-lg shadow-md">View Reports</button>
     </div>
 
     <!-- Unauthorized Access Section -->
