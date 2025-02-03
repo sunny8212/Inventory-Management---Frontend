@@ -6,7 +6,7 @@
     <p class="text-lg text-gray-600">Welcome, {{ user?.name || "Guest" }}!</p>
     <!-- <span v-if="user?.role" class="text-sm text-gray-500">Role: {{ user?.role }}</span> -->
     <div class="relative p-6 max-w-7xl mx-auto">
-    <!-- Logout Button -->
+      <!-- Logout Button -->
       <NuxtLink
         to="/"
         @click.prevent="handleLogout"
@@ -114,32 +114,18 @@
       v-else-if="user?.role === 'Viewer'"
       class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
-      <h3 class="text-2xl font-semibold text-gray-700 mb-4">Viewer Section</h3>
-      <p class="text-lg text-gray-700 mb-4">
-        You have view-only access to resources.
-      </p>
-      <div>
+      <h3 class="text-2xl font-semibold text-gray-00 mb-4">Client Section</h3>
+      <div class="space-x-4">
         <button
           @click="addNewProduct = true"
-          class="w-full sm:w-auto bg-gray-700 text-white py-2 px-4 rounded-lg shadow-md"
+          class="w-full sm:w-auto bg-zinc-500 text-white py-2 px-4 rounded-lg shadow-md"
         >
           Add New Product
         </button>
-        <button
-          @click="addNewProduct = true"
-          class="w-full sm:w-auto bg-gray-700 text-white py-2 px-4 rounded-lg shadow-md"
-        >
-          Update Product
-        </button>
-        <button
-          @click="addNewProduct = true"
-          class="w-full sm:w-auto bg-gray-700 text-white py-2 px-4 rounded-lg shadow-md"
-        >
-          Delete Product
-        </button>
+
         <button
           @click="showAllProduct = true"
-          class="w-full sm:w-auto bg-gray-700 text-white py-2 px-4 rounded-lg shadow-md"
+          class="w-full sm:w-auto bg-zinc-500 text-white py-2 px-4 rounded-lg shadow-md"
         >
           View All Product
         </button>
@@ -197,7 +183,7 @@
       <h3 class="text-2xl font-semibold text-indigo-700 mb-4">
         Enter Product details
       </h3>
-      <form @submit.prevent="handleSubmit" class="space-y-4">
+      <form @submit.prevent="handleNewProductSubmit" class="space-y-4">
         <h2 class="text-xl font-bold">
           {{ isEditMode ? "Edit Product" : "Add Product" }}
         </h2>
@@ -212,7 +198,6 @@
             id="name"
             placeholder="Enter product name"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
           />
         </div>
 
@@ -226,7 +211,6 @@
             id="sku"
             placeholder="Enter SKU"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
           />
         </div>
 
@@ -240,7 +224,6 @@
             id="category"
             placeholder="Enter category"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
           />
         </div>
 
@@ -254,7 +237,6 @@
             id="quantity"
             placeholder="Enter quantity"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
           />
         </div>
 
@@ -269,7 +251,6 @@
             id="price"
             placeholder="Enter price"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
           />
         </div>
 
@@ -283,7 +264,6 @@
             id="supplier"
             placeholder="Enter supplier information"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
           />
         </div>
 
@@ -295,7 +275,6 @@
             v-model="product.status"
             id="status"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
           >
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -315,80 +294,105 @@
       v-if="showAllProduct"
       class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
-      <h3 class="text-2xl font-semibold text-indigo-700 mb-4">
-        Dummy Data Table
-      </h3>
+      <h3 class="text-2xl font-semibold text-indigo-700 mb-4">All Products</h3>
       <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
-      <tr>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-          Name
-        </th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-          SKU
-        </th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-          Category
-        </th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-          Quantity
-        </th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-          Price
-        </th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-          Supplier
-        </th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-          Status
-        </th>
-        <th scope="col" class="relative px-6 py-3">
-          <span class="sr-only">Actions</span>
-        </th>
-      </tr>
-    </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
-      <tr v-for="(product, index) in products" :key="index">
-        <td class="px-6 py-4 whitespace-nowrap">{{ product.name }}</td>
-        <td class="px-6 py-4 whitespace-nowrap">{{ product.sku }}</td>
-        <td class="px-6 py-4 whitespace-nowrap">{{ product.category }}</td>
-        <td class="px-6 py-4 whitespace-nowrap">{{ product.quantity }}</td>
-        <td class="px-6 py-4 whitespace-nowrap">${{ product.price.toFixed(2) }}</td>
-        <td class="px-6 py-4 whitespace-nowrap">{{ product.supplier }}</td>
-        <td class="px-6 py-4 whitespace-nowrap">
-          <span
-            :class="[
-              product.status === 'active'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800',
-              'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-            ]"
-          >
-            {{ product.status }}
-          </span>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-          <button
-            @click="editProduct(product)"
-            class="text-indigo-600 hover:text-indigo-900"
-          >
-            Edit
-          </button>
-          <button
-            @click="deleteProduct(index)"
-            class="text-red-600 hover:text-red-900"
-          >
-            Delete
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Name
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              SKU
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Category
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Quantity
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Price
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Supplier
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Status
+            </th>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr v-for="(product, index) in products" :key="index">
+            <td class="px-6 py-4 whitespace-nowrap">{{ product.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ product.sku }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ product.category }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ product.quantity }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${{ product.price.toFixed(2) }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ product.supplier }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                :class="[
+                  product.status === 'active'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800',
+                  'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                ]"
+              >
+                {{ product.status }}
+              </span>
+            </td>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2"
+            >
+              <button
+                @click="editProduct(product)"
+                class="text-indigo-600 hover:text-indigo-900"
+              >
+                Edit
+              </button>
+              <button
+                @click="deleteProduct(product.id)"
+                class="text-red-600 hover:text-red-900"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, reactive, onMounted } from "vue";
+
 definePageMeta({
   middleware: "auth", // Apply the custom middleware
 });
@@ -397,44 +401,169 @@ const user = useState("user").value; // Access global user state
 const showModal = ref(false); // To control the visibility of the modal
 const newResource = ref({ name: "" }); // New resource object
 const showReports = ref(false); // To toggle the visibility of the reports table
-const addNewProduct = ref(false); // To add new product
-const showAllProduct = ref(false); // To view all product
+const addNewProduct = ref(false); // To add new product form visibility
+const showAllProduct = ref(false); // To view all products
+const isEditMode = ref(false); // Track edit mode
+const products = ref([]); // Store the list of products
+
+// Define the product state
+const product = reactive({
+  name: "",
+  sku: "",
+  category: "",
+  quantity: 0,
+  price: 0,
+  supplier: "",
+  status: "active",
+});
 
 // Function to create a new resource (could be user, item, etc.)
 function createResource() {
   console.log("Creating new resource:", newResource.value.name);
-  // Here you would typically call an API to create the resource
   showModal.value = false;
   newResource.value.name = ""; // Reset input field
 }
+
+// Logout function
 function handleLogout() {
   localStorage.removeItem("authToken");
   useState("user").value = null; // Reset the user state
   alert("You have logged out!");
 }
 
-defineProps({
-  product: {
-    type: Object,
-    default: () => ({
-      name: '',
-      sku: '',
-      category: '',
-      quantity: 0,
-      price: 0,
-      supplier: '',
-      status: 'active',
-    }),
-  },
-  isEditMode: {
-    type: Boolean,
-    default: false,
-  },
+// Function to submit new product data to backend
+const handleNewProductSubmit = async () => {
+  try {
+    console.log("Submitting product:", product);
+
+    const response = await fetch("http://localhost:8000/api/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(product),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Product added successfully!");
+      addNewProduct.value = false; // Close form modal
+      resetProductForm();
+      fetchProducts(); // Refresh product list
+    } else {
+      alert("Error: " + data.message);
+    }
+  } catch (error) {
+    console.error("Error adding product:", error);
+  }
+};
+
+// Function to fetch all products
+const fetchProducts = async () => {
+  try {
+    const response = await fetch("http://localhost:8000/api/products");
+    const data = await response.json();
+
+    if (response.ok) {
+      products.value = data;
+    } else {
+      console.error("Error fetching products:", data.message);
+    }
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
+
+// Function to reset product form
+const resetProductForm = () => {
+  Object.assign(product, {
+    name: "",
+    sku: "",
+    category: "",
+    quantity: 0,
+    price: 0,
+    supplier: "",
+    status: "active",
+  });
+};
+
+// Function to display all products
+const showAllProducts = async () => {
+  showAllProduct.value = true;
+  await fetchProducts(); // Ensure products are fetched before displaying
+};
+
+// Fetch products on component mount
+onMounted(() => {
+  fetchProducts();
 });
 
-const emit = defineEmits(['submit']);
-
-const handleSubmit = () => {
-  emit('submit');
+// Function to edit a product
+const editProduct = (productToEdit) => {
+  isEditMode.value = true;
+  addNewProduct.value = true; // Open the modal
+  product.value = { ...productToEdit }; // Copy product data for editing
 };
+
+// Function to update the product
+const updateProduct = async () => {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/api/products/${product.value.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product.value),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Product updated successfully!");
+      addNewProduct.value = false;
+      resetProductForm();
+      fetchProducts(); // Refresh product list
+    } else {
+      alert("Error updating product: " + data.message);
+    }
+  } catch (error) {
+    console.error("Error updating product:", error);
+  }
+};
+
+
+// Function to delete a product from backend
+const deleteProduct = async (productId) => {
+  if (!confirm("Are you sure you want to delete this product?")) return;
+
+  try {
+    const response = await fetch(`http://localhost:8000/api/products/${productId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json(); // Read JSON response
+
+    if (response.ok) {
+      alert("Product deleted successfully!");
+
+      // Remove the deleted product from the local `products` array
+      products.value = products.value.filter(product => product.id !== productId);
+      
+    } else {
+      console.error("Error deleting product:", data.message);
+      alert("Failed to delete the product: " + data.message);
+    }
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    alert("An error occurred while deleting the product.");
+  }
+};
+
 </script>
