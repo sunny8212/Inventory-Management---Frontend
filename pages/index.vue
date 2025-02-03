@@ -47,6 +47,9 @@
 </template>
 
 <script>
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 export default {
   data() {
     return {
@@ -57,7 +60,6 @@ export default {
   methods: {
   async login() {
     try {
-      // Use runtime config for API base URL
       const {
         public: { apiBase },
       } = useRuntimeConfig();
@@ -73,32 +75,28 @@ export default {
 
       if (error.value) {
         alert(
-          "Login failed: " +
-            (error.value.data?.message || error.value.message)
+          "Login failed: " + (error.value.data?.message || error.value.message)
         );
         return;
       }
 
       const token = data.value?.token;
-      if (token) {
-        localStorage.setItem("authToken", token);
+      const user = data.value?.user;
 
-        // Store user details in global state
-        const user = data.value?.user;
+      if (token && user) {
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
         useState("user").value = user;
 
-        // Ensure that the user details are set before navigating
-        await this.$nextTick(); // Makes sure state is updated before redirect
+        await this.$nextTick(); // Ensures state is updated before navigating
 
         // Redirect based on role
-        if (user?.role === "Admin" || user?.role === "Manager") {
-          console.log("Redirecting to /dashboard for role:", user.role);
+        if (user.role === "Admin" || user.role === "Manager") {
           navigateTo("/dashboard");
-        } else if (user?.role === "Viewer") {
-          console.log("Redirecting to /viewer for role:", user.role);
+        } else if (user.role === "Viewer") {
           navigateTo("/dashboard");
         } else {
-          console.error("Unauthorized role:", user?.role);
           alert("Unauthorized role!");
         }
       } else {
@@ -108,8 +106,9 @@ export default {
       console.error("Unexpected error during login:", error);
       alert("An unexpected error occurred!");
     }
-  },
+  }
 }
+
 
 };
 </script>

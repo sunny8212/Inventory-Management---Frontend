@@ -294,6 +294,13 @@
       v-if="showAllProduct"
       class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
+      <div
+        v-if="products.some((p) => p.isLowStock)"
+        class="bg-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mt-4"
+      >
+        ⚠️ Warning: Some products have low stock!
+      </div>
+
       <h3 class="text-2xl font-semibold text-indigo-700 mb-4">All Products</h3>
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -345,8 +352,13 @@
             </th>
           </tr>
         </thead>
+
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(product, index) in products" :key="index">
+          <tr
+            v-for="(product, index) in products"
+            :key="index"
+            :class="{ 'bg-red-200': product.isLowStock }"
+          >
             <td class="px-6 py-4 whitespace-nowrap">{{ product.name }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ product.sku }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ product.category }}</td>
@@ -376,12 +388,10 @@
               >
                 Edit
               </button>
-              <button
-                @click="deleteProduct(product.id)"
-                class="text-red-600 hover:text-red-900"
-              >
-                Delete
-              </button>
+              <button @click="deleteProduct(product._id || product.id)" class="text-red-600 hover:text-red-900">
+  Delete
+</button>
+
             </td>
           </tr>
         </tbody>
@@ -392,12 +402,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
+import { useToast } from "vue-toastification";
 
-definePageMeta({
-  middleware: "auth", // Apply the custom middleware
-});
+const toast = useToast();
 
-const user = useState("user").value; // Access global user state
+
+const user = ref(null); // Access global user state
 const showModal = ref(false); // To control the visibility of the modal
 const newResource = ref({ name: "" }); // New resource object
 const showReports = ref(false); // To toggle the visibility of the reports table
@@ -405,6 +415,8 @@ const addNewProduct = ref(false); // To add new product form visibility
 const showAllProduct = ref(false); // To view all products
 const isEditMode = ref(false); // Track edit mode
 const products = ref([]); // Store the list of products
+const lowStockThreshold = 5; // Set stock threshold
+
 
 // Define the product state
 const product = reactive({
@@ -427,8 +439,9 @@ function createResource() {
 // Logout function
 function handleLogout() {
   localStorage.removeItem("authToken");
-  useState("user").value = null; // Reset the user state
-  alert("You have logged out!");
+  localStorage.removeItem("user"); // Clear user from storage
+  user.value = null; // Reset user state
+  alert("You have been logged out successfully.");
 }
 
 // Function to submit new product data to backend
@@ -447,12 +460,10 @@ const handleNewProductSubmit = async () => {
     const data = await response.json();
 
     if (response.ok) {
-      alert("Product added successfully!");
       addNewProduct.value = false; // Close form modal
       resetProductForm();
       fetchProducts(); // Refresh product list
     } else {
-      alert("Error: " + data.message);
     }
   } catch (error) {
     console.error("Error adding product:", error);
@@ -464,9 +475,11 @@ const fetchProducts = async () => {
   try {
     const response = await fetch("http://localhost:8000/api/products");
     const data = await response.json();
-
     if (response.ok) {
-      products.value = data;
+      products.value = data.map((product) => ({
+        ...product,
+        isLowStock: product.quantity < lowStockThreshold, // Flag low stock
+      }));
     } else {
       console.error("Error fetching products:", data.message);
     }
@@ -489,13 +502,18 @@ const resetProductForm = () => {
 };
 
 // Function to display all products
-const showAllProducts = async () => {
-  showAllProduct.value = true;
-  await fetchProducts(); // Ensure products are fetched before displaying
-};
 
 // Fetch products on component mount
 onMounted(() => {
+  const storedUser = localStorage.getItem("user");
+  
+  if (storedUser) {
+    user.value = JSON.parse(storedUser);
+    console.log("User Role:", user.value.role); // Debugging log
+  } else {
+    console.log("No user found in localStorage.");
+  }
+
   fetchProducts();
 });
 
@@ -523,21 +541,20 @@ const updateProduct = async () => {
     const data = await response.json();
 
     if (response.ok) {
-      alert("Product updated successfully!");
       addNewProduct.value = false;
       resetProductForm();
       fetchProducts(); // Refresh product list
     } else {
-      alert("Error updating product: " + data.message);
     }
   } catch (error) {
     console.error("Error updating product:", error);
   }
 };
 
-
 // Function to delete a product from backend
 const deleteProduct = async (productId) => {
+  console.log("Attempting to delete product with ID:", productId); // Debugging log
+
   if (!confirm("Are you sure you want to delete this product?")) return;
 
   try {
@@ -547,23 +564,17 @@ const deleteProduct = async (productId) => {
         "Content-Type": "application/json",
       },
     });
-
-    const data = await response.json(); // Read JSON response
-
+debugger
     if (response.ok) {
-      alert("Product deleted successfully!");
-
-      // Remove the deleted product from the local `products` array
       products.value = products.value.filter(product => product.id !== productId);
-      
     } else {
+      const data = await response.json();
       console.error("Error deleting product:", data.message);
-      alert("Failed to delete the product: " + data.message);
+      toast.error("Failed to delete the product: " + data.message); // ✅ Show error as toast
     }
   } catch (error) {
     console.error("Error deleting product:", error);
-    alert("An error occurred while deleting the product.");
+    toast.error("An error occurred while deleting the product."); // ✅ Show server error
   }
 };
-
 </script>
