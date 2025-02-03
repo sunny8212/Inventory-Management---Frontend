@@ -115,6 +115,20 @@
       class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
       <h3 class="text-2xl font-semibold text-gray-00 mb-4">Client Section</h3>
+      <div
+        v-if="products.some((p) => p.isLowStock)"
+        class="bg-yellow-200 border-l-4 text-yellow-800 px-4 py-3 rounded-lg m-4"
+      >
+        ⚠️ Warning: <strong>{{ lowStockCount }}</strong> products have low
+        stock!
+      </div>
+      <div
+        v-if="totalInventoryValue > 0"
+        class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 px-4 py-3 rounded-lg m-4"
+      >
+        🏷️ <strong>Total Inventory Value:</strong> ₹
+        {{ totalInventoryValue.toFixed(2) }}
+      </div>
       <div class="space-x-4">
         <button
           @click="addNewProduct = true"
@@ -128,6 +142,12 @@
           class="w-full sm:w-auto bg-zinc-500 text-white py-2 px-4 rounded-lg shadow-md"
         >
           View All Product
+        </button>
+        <button
+          @click="exportToCSV"
+          class="bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-800 mt-4 ml-[18rem]"
+        >
+          📥 Export Report as CSV
         </button>
       </div>
       <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6">
@@ -275,6 +295,31 @@
             required
           />
         </div>
+        <div>
+          <label for="restock" class="block text-sm font-medium text-gray-700"
+            >Restock Quantity</label
+          >
+          <input
+            v-model="product.restocked"
+            type="number"
+            id="supplier"
+            placeholder="Enter Restock Quantity"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            required
+          />
+        </div><div>
+          <label for="supplier" class="block text-sm font-medium text-gray-700"
+            >Sold Quantity</label
+          >
+          <input
+            v-model="product.sold"
+            type="number"
+            id="sold"
+            placeholder="Enter Sold Quantity"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            required
+          />
+        </div>
 
         <div>
           <label for="status" class="block text-sm font-medium text-gray-700"
@@ -398,15 +443,8 @@
       v-if="showAllProduct"
       class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
-      <div
-        v-if="products.some((p) => p.isLowStock)"
-        class="bg-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mt-4"
-      >
-        ⚠️ Warning: Some products have low stock!
-      </div>
-
-      <h3 class="text-2xl font-semibold text-indigo-700 mb-4">All Products</h3>
-      <table class="min-w-full divide-y divide-gray-200 pr-10">
+      <h3 class="text-2xl font-semibold text-indigo-700">All Products</h3>
+      <table class="min-w-full divide-y divide-gray-200 mr-4">
         <thead class="bg-gray-50">
           <tr>
             <th
@@ -468,7 +506,7 @@
             <td class="px-6 py-4 whitespace-nowrap">{{ product.category }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ product.quantity }}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-              ${{ product.price.toFixed(2) }}
+              ₹ {{ product.price.toFixed(2) }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">{{ product.supplier }}</td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -574,16 +612,28 @@ const handleNewProductSubmit = async () => {
   }
 };
 
-// Function to fetch all products
+// Function to fetch all products with lowstock count
+const lowStockCount = ref(0); // New state for low stock items count
+const totalInventoryValue = ref(0); // New state for inventory value
+
 const fetchProducts = async () => {
   try {
     const response = await fetch("http://localhost:8000/api/products");
     const data = await response.json();
+
     if (response.ok) {
       products.value = data.map((product) => ({
         ...product,
         isLowStock: product.quantity < lowStockThreshold, // Flag low stock
       }));
+
+      // Calculate low stock items count
+      lowStockCount.value = products.value.filter((p) => p.isLowStock).length;
+
+      // Calculate total inventory value
+      totalInventoryValue.value = products.value.reduce((sum, product) => {
+        return sum + product.price * product.quantity;
+      }, 0);
     } else {
       console.error("Error fetching products:", data.message);
     }
@@ -645,11 +695,11 @@ const deleteProduct = async (productId) => {
     } else {
       const data = await response.json();
       console.error("Error deleting product:", data.message);
-      toast.error("Failed to delete the product: " + data.message); // ✅ Show error as toast
+      alert("Failed to delete the product: " + data.message);
     }
   } catch (error) {
     console.error("Error deleting product:", error);
-    toast.error("An error occurred while deleting the product."); // ✅ Show server error
+    alert("An error occurred while deleting the product.");
   }
 };
 
@@ -670,7 +720,7 @@ const handleEditProductSubmit = async () => {
     );
     debugger;
     if (!response.ok) {
-      toast.error("Failed to fetch product data from backend.");
+      alert("Failed to fetch product data from backend.");
       return;
     }
 
@@ -708,14 +758,14 @@ const handleEditProductSubmit = async () => {
       selectedProduct.value = null; // Close modal
       alert("Product updated successfully and merged with backend!");
       setTimeout(() => {
-        window.location.reload();
-      }, 1000); 
+        windolocaw.tion.reload();
+      }, 1000);
     } else {
-      toast.error("Failed to update product: " + data.message);
+      alert("Failed to update product: " + data.message);
     }
   } catch (error) {
     console.error("Error updating product:", error);
-    toast.error("An error occurred while updating the product.");
+    alert("An error occurred while updating the product.");
   }
 };
 
@@ -768,5 +818,46 @@ const chartOptions = {
   plugins: {
     legend: { display: false },
   },
+};
+
+// Export products to CSV
+const exportToCSV = () => {
+  if (products.value.length === 0) {
+    alert("No data available to export.");
+    return;
+  }
+
+  // Define CSV headers
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Name,SKU,Category,Quantity,Price,Supplier,Status\n";
+
+  // Append product data
+  products.value.forEach((product) => {
+    const row = [
+      `"${product.name}"`,
+      `"${product.sku}"`,
+      `"${product.category}"`,
+      product.quantity,
+      product.price.toFixed(2),
+      `"${product.supplier}"`,
+      `"${product.status}"`,
+    ].join(",");
+
+    csvContent += row + "\n";
+  });
+
+  // Create a download link and trigger it
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute(
+    "download",
+    `inventory_report_${new Date().toISOString().split("T")[0]}.csv`
+  );
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  alert("CSV report downloaded successfully!");
 };
 </script>
