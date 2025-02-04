@@ -1,55 +1,22 @@
-# Inventory Management System
+<h1>Inventory Management System</h1>
+
+Overview
 
 The Inventory Management System is a web application built with Nuxt.js (Vue.js) and Tailwind CSS for the frontend. The backend is powered by MongoDB and Express.js, providing a robust system for users to manage their inventory efficiently. The system offers product tracking, monthly statistics visualization through graphs, and downloadable reports in CSV format within a user-friendly dashboard.
 
-## Features
-- User Authentication: Secure authentication using middleware.
+Features
 
-- Inventory Management: Add, update, and delete products seamlessly.
+User Authentication: Secure authentication using middleware.
 
-- Graphical Insights: View product statistics with dynamic charts.
+Inventory Management: Add, update, and delete products seamlessly.
 
-- CSV Export: Download reports of inventory data for analysis.
+Graphical Insights: View product statistics with dynamic charts.
 
-- Dashboard Overview: Get an overview of your inventory status at a glance.
+CSV Export: Download reports of inventory data for analysis.
 
-## Technology Stack
+Dashboard Overview: Get an overview of your inventory status at a glance.
 
-Frontend:
 
-- Nuxt.js (Vue.js) – A powerful framework for building performant Vue applications.
-
-- Tailwind CSS – A utility-first CSS framework for rapid UI development.
-
-Backend:
-
-- MongoDB – NoSQL database for storing inventory data.
-
-- Express.js – A minimalist web framework for Node.js.
-
-## Project Structure
-<pre>└── sunny8212-inventory-management---frontend/
-    ├── README.md
-    ├── app.vue
-    ├── nuxt.config.ts
-    ├── package.json
-    ├── pnpm-lock.yaml
-    ├── tailwind.config.js
-    ├── tsconfig.json
-    ├── assets/
-    │   └── css/
-    │       ├── main.css
-    │       └── tailwind.css
-    ├── middleware/
-    │   └── auth.js
-    ├── pages/
-    │   ├── dashboard.vue
-    │   ├── index.vue
-    │   └── register.vue
-    ├── public/
-    │   └── robots.txt
-    └── server/
-        └── tsconfig.json</pre>
 
 ## Setup
 

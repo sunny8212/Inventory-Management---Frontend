@@ -1,8 +1,7 @@
-import { useToast } from "vue-toastification";
+
 
 export default defineNuxtRouteMiddleware((to, from) => {
 
-const toast = useToast();
   const user = useState('user').value;
 
   // // Redirect to login if user is not logged in

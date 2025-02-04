@@ -45,70 +45,57 @@
     </div>
   </div>
 </template>
+<script setup>
+import { ref, nextTick } from 'vue'
+import { useRuntimeConfig, useFetch, useState, navigateTo } from '#imports'
 
-<script>
-import { useToast } from "vue-toastification";
+const email = ref('')
+const password = ref('')
 
-const toast = useToast();
-export default {
-  data() {
-    return {
-      email: "",
-      password: "",
-    };
-  },
-  methods: {
-  async login() {
-    try {
-      const {
-        public: { apiBase },
-      } = useRuntimeConfig();
+async function login() {
+  try {
+    const { public: { apiBase } } = useRuntimeConfig()
 
-      const { data, error } = await useFetch("/api/auth/login", {
-        baseURL: apiBase,
-        method: "POST",
-        body: {
-          email: this.email,
-          password: this.password,
-        },
-      });
+    const { data, error } = await useFetch('/api/auth/login', {
+      baseURL: apiBase,
+      method: 'POST',
+      body: {
+        email: email.value,
+        password: password.value,
+      },
+    })
 
-      if (error.value) {
-        alert(
-          "Login failed: " + (error.value.data?.message || error.value.message)
-        );
-        return;
-      }
-
-      const token = data.value?.token;
-      const user = data.value?.user;
-
-      if (token && user) {
-        localStorage.setItem("authToken", token);
-        localStorage.setItem("user", JSON.stringify(user));
-
-        useState("user").value = user;
-
-        await this.$nextTick(); // Ensures state is updated before navigating
-
-        // Redirect based on role
-        if (user.role === "Admin" || user.role === "Manager") {
-          navigateTo("/dashboard");
-        } else if (user.role === "Viewer") {
-          navigateTo("/dashboard");
-        } else {
-          alert("Unauthorized role!");
-        }
-      } else {
-        alert("Token not found in response!");
-      }
-    } catch (error) {
-      console.error("Unexpected error during login:", error);
-      alert("An unexpected error occurred!");
+    if (error.value) {
+      alert(
+        "Login failed: " +
+          (error.value.data?.message || error.value.message)
+      )
+      return
     }
+
+    const token = data.value?.token
+    const user = data.value?.user
+
+    if (token && user) {
+      localStorage.setItem('authToken', token)
+      localStorage.setItem('user', JSON.stringify(user))
+      useState('user').value = user
+
+      await nextTick() // Ensures state is updated before navigating
+
+      // Redirect based on role
+      if (user.role === 'Admin' || user.role === 'Manager' || user.role === 'Viewer') {
+        navigateTo('/dashboard')
+      } else {
+        alert('Unauthorized role!')
+      }
+    } else {
+      alert('Token not found in response!')
+    }
+  } catch (error) {
+    console.error('Unexpected error during login:', error)
+    alert('An unexpected error occurred!')
   }
 }
-
-
-};
 </script>
+

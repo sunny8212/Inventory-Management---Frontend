@@ -601,7 +601,7 @@ const handleNewProductSubmit = async () => {
   try {
     console.log("Submitting product:", product);
 
-    const response = await fetch("http://localhost:8000/api/products", {
+    const response = await fetch("https://inventory-management-backend-yvvk.onrender.com/api/products", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -629,7 +629,7 @@ const totalInventoryValue = ref(0); // New state for inventory value
 
 const fetchProducts = async () => {
   try {
-    const response = await fetch("http://localhost:8000/api/products");
+    const response = await fetch("https://inventory-management-backend-yvvk.onrender.com/api/products");
     const data = await response.json();
 
     if (response.ok) {
@@ -690,7 +690,7 @@ const deleteProduct = async (productId) => {
 
   try {
     const response = await fetch(
-      `http://localhost:8000/api/products/${productId}`,
+      `https://inventory-management-backend-yvvk.onrender.com/api/products/${productId}`,
       {
         method: "DELETE",
         headers: {
@@ -733,7 +733,7 @@ const handleEditProductSubmit = async () => {
 
     // Fetch the existing product data from the backend
     const response = await fetch(
-      `http://localhost:8000/api/products/${selectedProduct.value.id}`
+      `https://inventory-management-backend-yvvk.onrender.com/api/products/${selectedProduct.value.id}`
     );
 
     if (!response.ok) {
@@ -766,7 +766,7 @@ const handleEditProductSubmit = async () => {
 
     // Send PUT request to update product
     const updateResponse = await fetch(
-      `http://localhost:8000/api/product/${selectedProduct.value.id}`,
+      `https://inventory-management-backend-yvvk.onrender.com/api/product/${selectedProduct.value.id}`,
       {
         method: "PUT",
         headers: {
@@ -821,7 +821,7 @@ const stockByCategory = ref([]);
 
 const fetchStockByCategory = async () => {
   try {
-    const response = await fetch("http://localhost:8000/api/stock-by-category");
+    const response = await fetch("https://inventory-management-backend-yvvk.onrender.com/api/stock-by-category");
     const data = await response.json();
     stockByCategory.value = data;
   } catch (error) {
@@ -923,7 +923,7 @@ const productStockUpdates = ref([]);
 const fetchProductStockUpdates = async () => {
   try {
     const response = await fetch(
-      "http://localhost:8000/api/product-monthly-stock-updates"
+      "https://inventory-management-backend-yvvk.onrender.com/api/product-monthly-stock-updates"
     );
     const data = await response.json();
 
@@ -946,7 +946,7 @@ onMounted(fetchProductStockUpdates);
 const exportProductStockCSV = async () => {
   try {
     const response = await fetch(
-      "http://localhost:8000/api/export-product-monthly-stock"
+      "https://inventory-management-backend-yvvk.onrender.com/api/export-product-monthly-stock"
     );
 
     if (!response.ok) {
