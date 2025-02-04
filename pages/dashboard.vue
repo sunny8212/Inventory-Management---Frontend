@@ -1,10 +1,10 @@
 <template>
-  <div class="p-6 flex flex-col items-center bg-zinc-300 min-h-screen">
+  <div class="p-6 flex flex-col items-center bg-zinc-400 min-h-screen">
     <h2 class="text-4xl font-bold mb-4 text-center text-indigo-700">
       {{ user?.role }} Dashboard
     </h2>
-    <p class="text-lg text-gray-600">Welcome, {{ user?.name || "Guest" }}!</p>
-    <!-- <span v-if="user?.role" class="text-sm text-gray-500">Role: {{ user?.role }}</span> -->
+    <p class="text-lg text-gray-800">Welcome, {{ user?.name || "Guest" }}!</p>
+    <span v-if="user?.role" class="text-sm text-gray-700">Role: {{ user?.role }}</span>
     <div class="relative p-6 max-w-7xl mx-auto">
       <!-- Logout Button -->
       <NuxtLink
@@ -19,7 +19,7 @@
     <!-- Admin Section -->
     <div
       v-if="user?.role === 'Admin'"
-      class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
+      class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
       <h3 class="text-2xl font-semibold text-indigo-700 mb-4">Admin Section</h3>
       <p class="text-lg text-gray-700 mb-4">
@@ -80,7 +80,7 @@
     <!-- Manager Section -->
     <div
       v-else-if="user?.role === 'Manager'"
-      class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
+      class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
       <h3 class="text-2xl font-semibold text-green-700 mb-4">
         Manager Section
@@ -162,53 +162,9 @@
       </div>
     </div>
 
-    <!-- Unauthorized Access Section -->
-    <div v-else class="w-full max-w-4xl bg-red-100 p-4 mt-6 rounded-lg">
-      <p class="text-red-500 text-lg font-semibold">
-        Unauthorized access: Your role does not have permission to access this
-        page.
-      </p>
-    </div>
-
-    <!-- Reports Table -->
-    <div
-      v-if="showReports"
-      class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
-    >
-      <h3 class="text-2xl font-semibold text-indigo-700 mb-4">
-        Dummy Data Table
-      </h3>
-      <table class="w-full table-auto">
-        <thead>
-          <tr>
-            <th class="px-4 py-2 border">ID</th>
-            <th class="px-4 py-2 border">Name</th>
-            <th class="px-4 py-2 border">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="px-4 py-2 border">1</td>
-            <td class="px-4 py-2 border">Resource A</td>
-            <td class="px-4 py-2 border">Active</td>
-          </tr>
-          <tr>
-            <td class="px-4 py-2 border">2</td>
-            <td class="px-4 py-2 border">Resource B</td>
-            <td class="px-4 py-2 border">Inactive</td>
-          </tr>
-          <tr>
-            <td class="px-4 py-2 border">3</td>
-            <td class="px-4 py-2 border">Resource C</td>
-            <td class="px-4 py-2 border">Active</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
     <div
       v-if="addNewProduct"
-      class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
+      class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
       <h3 class="text-2xl font-semibold text-indigo-700 mb-4">
         Enter Product details
@@ -320,12 +276,14 @@
       </form>
     </div>
     <!-- 📌 Product-Wise Monthly Stock Updates -->
-    <div class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6">
+    <div 
+    v-if="user?.role === 'Viewer'"
+    class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6">
       <h3 class="text-2xl font-semibold text-indigo-700 mb-4">
         Product-Wise Monthly Stock Updates
         <button
           @click="exportToCSV"
-          class="bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-800 mt-4 ml-[33rem]"
+          class="bg-blue-600 text-white py-2 px-4 text-sm rounded-lg shadow-md hover:bg-blue-800 mt-4 ml-[30rem]"
         >
           📥 Export Report as CSV
         </button>
@@ -372,10 +330,11 @@
     <!-- Edit Product Modal -->
     <div
       v-if="selectedProduct"
-      class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
+      class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
       <h3 class="text-2xl font-semibold text-indigo-700 mb-4">Edit Product</h3>
-      <form @submit.prevent="handleEditProductSubmit()" class="space-y-4">
+      <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6">
+        <form @submit.prevent="handleEditProductSubmit()" class="space-y-4">
         <div>
           <label for="editName" class="block text-sm font-medium text-gray-700"
             >Name</label
@@ -490,11 +449,12 @@
           </button>
         </div>
       </form>
+      </div>
     </div>
 
     <div
       v-if="showAllProduct"
-      class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
+      class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
       <h3 class="text-2xl font-semibold text-indigo-700">All Products</h3>
       <table class="min-w-full divide-y divide-gray-200 mr-4">
