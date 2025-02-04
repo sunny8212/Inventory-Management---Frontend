@@ -7,8 +7,11 @@ export default defineNuxtConfig({
   pages: true,
   runtimeConfig: {
     public: {
-      apiBase: 'http://localhost:8000', // Your backend server URL
+      apiBase: 'https://inventory-management-backend-yvvk.onrender.com', // Your backend server URL
     },
+  },
+  nitro: {
+    preset: 'netlify'
   },
   css: ['~/assets/css/main.css'],
   vite: {
