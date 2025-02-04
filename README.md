@@ -28,7 +28,7 @@ MongoDB – NoSQL database for storing inventory data.
 Express.js – A minimalist web framework for Node.js.
 
 ## Project Structure
-└── sunny8212-inventory-management---frontend/
+<pre>└── sunny8212-inventory-management---frontend/
     ├── README.md
     ├── app.vue
     ├── nuxt.config.ts
@@ -49,7 +49,7 @@ Express.js – A minimalist web framework for Node.js.
     ├── public/
     │   └── robots.txt
     └── server/
-        └── tsconfig.json
+        └── tsconfig.json</pre>
 
 ## Setup
 
