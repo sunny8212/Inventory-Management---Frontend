@@ -112,7 +112,7 @@
     <!-- Viewer Section -->
     <div
       v-else-if="user?.role === 'Viewer'"
-      class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6"
+      class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
       <h3 class="text-2xl font-semibold text-gray-00 mb-4">Client Section</h3>
       <div
@@ -122,6 +122,7 @@
         ⚠️ Warning: <strong>{{ lowStockCount }}</strong> products have low
         stock!
       </div>
+
       <div
         v-if="totalInventoryValue > 0"
         class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 px-4 py-3 rounded-lg m-4"
@@ -145,12 +146,12 @@
         </button>
         <button
           @click="exportToCSV"
-          class="bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-800 mt-4 ml-[18rem]"
+          class="bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-800 mt-4 ml-[33rem]"
         >
           📥 Export Report as CSV
         </button>
       </div>
-      <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6">
+      <div class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6">
         <h3 class="text-2xl font-semibold text-indigo-700 mb-4">
           Stock Levels by Category
         </h3>
@@ -295,31 +296,6 @@
             required
           />
         </div>
-        <div>
-          <label for="restock" class="block text-sm font-medium text-gray-700"
-            >Restock Quantity</label
-          >
-          <input
-            v-model="product.restocked"
-            type="number"
-            id="supplier"
-            placeholder="Enter Restock Quantity"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div><div>
-          <label for="supplier" class="block text-sm font-medium text-gray-700"
-            >Sold Quantity</label
-          >
-          <input
-            v-model="product.sold"
-            type="number"
-            id="sold"
-            placeholder="Enter Sold Quantity"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div>
 
         <div>
           <label for="status" class="block text-sm font-medium text-gray-700"
@@ -342,6 +318,55 @@
           Add Product
         </button>
       </form>
+    </div>
+    <!-- 📌 Product-Wise Monthly Stock Updates -->
+    <div class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6">
+      <h3 class="text-2xl font-semibold text-indigo-700 mb-4">
+        Product-Wise Monthly Stock Updates
+        <button
+          @click="exportToCSV"
+          class="bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-800 mt-4 ml-[33rem]"
+        >
+          📥 Export Report as CSV
+        </button>
+      </h3>
+      <!-- 📌 Export Button for Product-Wise Monthly Stock Report -->
+      
+
+      <!-- 📌 Table for Product-Wise Monthly Data -->
+      <table class="w-full table-auto border-collapse border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2">Product</th>
+            <th class="border border-gray-300 px-4 py-2">Month</th>
+            <th class="border border-gray-300 px-4 py-2">Restocked</th>
+            <th class="border border-gray-300 px-4 py-2">Sold</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(update, index) in productStockUpdates" :key="index">
+            <td class="border border-gray-300 px-4 py-2">
+              {{ update.product }}
+            </td>
+            <td class="border border-gray-300 px-4 py-2">{{ update.month }}</td>
+            <td
+              class="border border-gray-300 px-4 py-2 text-green-600 font-bold"
+            >
+              {{ update.restocked }}
+            </td>
+            <td class="border border-gray-300 px-4 py-2 text-red-600 font-bold">
+              {{ update.sold }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 📌 Chart for Product-Wise Monthly Data -->
+      <Bar
+        v-if="productStockChartData"
+        :data="productStockChartData"
+        :options="chartOptionsss"
+      />
     </div>
 
     <!-- Edit Product Modal -->
@@ -401,6 +426,34 @@
             v-model="selectedProduct.supplier"
             type="text"
             id="editSupplier"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+          />
+        </div>
+
+        <!-- Restock Quantity Field -->
+        <div>
+          <label for="restock" class="block text-sm font-medium text-gray-700"
+            >Restock Quantity</label
+          >
+          <input
+            v-model.number="selectedProduct.restocked"
+            type="number"
+            id="restock"
+            placeholder="Enter Restock Quantity"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+          />
+        </div>
+
+        <!-- Sold Quantity Field -->
+        <div>
+          <label for="sold" class="block text-sm font-medium text-gray-700"
+            >Sold Quantity</label
+          >
+          <input
+            v-model.number="selectedProduct.sold"
+            type="number"
+            id="sold"
+            placeholder="Enter Sold Quantity"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -546,9 +599,6 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import { useToast } from "vue-toastification";
-
-const toast = useToast();
 
 const user = ref(null); // Access global user state
 const showModal = ref(false); // To control the visibility of the modal
@@ -602,6 +652,7 @@ const handleNewProductSubmit = async () => {
     const data = await response.json();
 
     if (response.ok) {
+      alert("Product added successfully!");
       addNewProduct.value = false; // Close form modal
       resetProductForm();
       fetchProducts(); // Refresh product list
@@ -627,10 +678,10 @@ const fetchProducts = async () => {
         isLowStock: product.quantity < lowStockThreshold, // Flag low stock
       }));
 
-      // Calculate low stock items count
+      // ✅ Calculate the number of products that are low stock
       lowStockCount.value = products.value.filter((p) => p.isLowStock).length;
 
-      // Calculate total inventory value
+      // ✅ Calculate total inventory value
       totalInventoryValue.value = products.value.reduce((sum, product) => {
         return sum + product.price * product.quantity;
       }, 0);
@@ -707,6 +758,8 @@ const deleteProduct = async (productId) => {
 const editProduct = (product) => {
   selectedProduct.value = { ...product };
   selectedProduct.value.id = product.id || product._id; // Ensure the correct ID is used
+  selectedProduct.value.restocked = 0; // Reset restocked field
+  selectedProduct.value.sold = 0; // Reset sold field
 };
 
 // Function to submit edited product
@@ -714,11 +767,15 @@ const handleEditProductSubmit = async () => {
   if (!selectedProduct.value) return;
 
   try {
+    // Ensure that restocked and sold values are correctly parsed as numbers
+    const restockedAmount = Number(selectedProduct.value.restocked) || 0;
+    const soldAmount = Number(selectedProduct.value.sold) || 0;
+
     // Fetch the existing product data from the backend
     const response = await fetch(
       `http://localhost:8000/api/products/${selectedProduct.value.id}`
     );
-    debugger;
+
     if (!response.ok) {
       alert("Failed to fetch product data from backend.");
       return;
@@ -726,13 +783,28 @@ const handleEditProductSubmit = async () => {
 
     const existingProduct = await response.json();
 
-    // Merge backend data with updated fields from frontend
+    // Calculate new quantity correctly
+    const newQuantity = existingProduct.quantity + restockedAmount - soldAmount;
+    if (newQuantity < 0) {
+      alert("Error: Quantity cannot be negative!");
+      return;
+    }
+
+    // Prepare updated product data
     const updatedProduct = {
-      ...existingProduct, // Preserve existing data
-      ...selectedProduct.value, // Overwrite only modified fields
+      ...existingProduct,
+      name: selectedProduct.value.name,
+      sku: selectedProduct.value.sku,
+      category: selectedProduct.value.category,
+      quantity: newQuantity,
+      price: selectedProduct.value.price,
+      supplier: selectedProduct.value.supplier,
+      status: selectedProduct.value.status,
+      restocked: existingProduct.restocked + restockedAmount,
+      sold: existingProduct.sold + soldAmount,
     };
 
-    // Send PATCH request to update only changed fields
+    // Send PUT request to update product
     const updateResponse = await fetch(
       `http://localhost:8000/api/product/${selectedProduct.value.id}`,
       {
@@ -747,7 +819,7 @@ const handleEditProductSubmit = async () => {
     const data = await updateResponse.json();
 
     if (updateResponse.ok) {
-      // Update the local product list
+      // Update the product in the frontend list immediately
       const index = products.value.findIndex(
         (p) => p.id === selectedProduct.value.id
       );
@@ -756,10 +828,8 @@ const handleEditProductSubmit = async () => {
       }
 
       selectedProduct.value = null; // Close modal
-      alert("Product updated successfully and merged with backend!");
-      setTimeout(() => {
-        windolocaw.tion.reload();
-      }, 1000);
+      alert("Product updated successfully!");
+      fetchProducts(); // Refresh product list
     } else {
       alert("Failed to update product: " + data.message);
     }
@@ -859,5 +929,86 @@ const exportToCSV = () => {
   document.body.removeChild(link);
 
   alert("CSV report downloaded successfully!");
+};
+
+const productStockChartData = computed(() => ({
+  labels: [...new Set(productStockUpdates.value.map((item) => item.month))], // Get unique months
+  datasets: productStockUpdates.value.reduce((acc, item) => {
+    let existingProduct = acc.find((dataset) => dataset.label === item.product);
+
+    if (!existingProduct) {
+      acc.push({
+        label: item.product,
+        backgroundColor:
+          "#" + Math.floor(Math.random() * 16777215).toString(16), // Random colors
+        data: [],
+      });
+      existingProduct = acc[acc.length - 1];
+    }
+
+    existingProduct.data.push(item.restocked - item.sold); // Net stock change
+    return acc;
+  }, []),
+}));
+
+const chartOptionsss = {
+  responsive: true,
+  plugins: {
+    legend: { display: true },
+  },
+};
+
+const productStockUpdates = ref([]);
+
+const fetchProductStockUpdates = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:8000/api/product-monthly-stock-updates"
+    );
+    const data = await response.json();
+
+    if (response.ok) {
+      productStockUpdates.value = data;
+    } else {
+      console.error(
+        "Error fetching product-wise monthly stock updates:",
+        data.error
+      );
+    }
+  } catch (error) {
+    console.error("Error fetching product stock updates:", error);
+  }
+};
+
+// 📌 Fetch data when component is mounted
+onMounted(fetchProductStockUpdates);
+
+const exportProductStockCSV = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:8000/api/export-product-monthly-stock"
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to download CSV");
+    }
+
+    // Convert response to blob
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    // Create download link and trigger click
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "product_monthly_stock.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    alert("CSV report downloaded successfully!");
+  } catch (error) {
+    console.error("Error exporting CSV:", error);
+    alert("Failed to export CSV file.");
+  }
 };
 </script>
