@@ -1,6 +1,6 @@
 ## Inventory Management System
 
-Overview
+# Overview
 
 The Inventory Management System is a web application built with Nuxt.js (Vue.js) and Tailwind CSS for the frontend. The backend is powered by MongoDB and Express.js, providing a robust system for users to manage their inventory efficiently. The system offers product tracking, monthly statistics visualization through graphs, and downloadable reports in CSV format within a user-friendly dashboard.
 
