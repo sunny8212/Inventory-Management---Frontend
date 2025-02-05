@@ -1,20 +1,25 @@
 <template>
   <div class="p-6 flex flex-col items-center bg-zinc-400 min-h-screen">
-    <h2 class="text-4xl font-bold mb-4 text-center text-indigo-700">
-      {{ user?.role }} Dashboard
-    </h2>
-    <p class="text-lg text-gray-800">Welcome, {{ user?.name || "Guest" }}!</p>
-    <span v-if="user?.role" class="text-sm text-gray-700">Role: {{ user?.role }}</span>
-    <div class="relative p-6 max-w-7xl mx-auto">
-      <!-- Logout Button -->
-      <NuxtLink
-        to="/"
-        @click.prevent="handleLogout"
-        class="absolute bottom-20 left-90 bg-red-500 text-white py-2 px-2 rounded-lg shadow-md hover:bg-red-300 transition"
-      >
-        Logout
-      </NuxtLink>
-    </div>
+  <h2 class="text-4xl font-bold mb-4 text-center text-indigo-700">
+    {{ user?.role }} Dashboard
+  </h2>
+  <p class="text-lg text-gray-800">Welcome, {{ user?.name || "Guest" }}!</p>
+  <span v-if="user?.role" class="text-sm text-gray-700">
+    Role: {{ user?.role }}
+  </span>
+
+  <div class="relative p-6 max-w-7xl mx-auto">
+    <!-- Logout Button -->
+    <NuxtLink
+      to="/"
+      @click.prevent="handleLogout"
+      class="absolute bottom-20 sm:top-6 sm:right-6 h-8 w-18 flex justify-center items-center bg-red-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-300 transition"
+    >
+      Logout
+    </NuxtLink>
+  </div>
+
+
 
     <!-- Admin Section -->
     <div
@@ -111,56 +116,85 @@
 
     <!-- Viewer Section -->
     <div
-      v-else-if="user?.role === 'Viewer'"
-      class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6"
+  v-else-if="user?.role === 'Viewer'"
+  class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6"
+>
+  <h3 class="text-2xl font-semibold text-gray-700 mb-4">Client Section</h3>
+
+  <div class="space-x-4 flex flex-wrap">
+    <button
+      @click="addNewProduct = true"
+      class="w-full sm:w-auto bg-zinc-500 text-white py-2 px-4 rounded-lg shadow-md mb-4 sm:mb-0"
     >
-      <h3 class="text-2xl font-semibold text-gray-00 mb-4">Client Section</h3>
-      <div
-        v-if="products.some((p) => p.isLowStock)"
-        class="bg-yellow-200 border-l-4 text-yellow-800 px-4 py-3 rounded-lg m-4"
-      >
-        ⚠️ Warning: <strong>{{ lowStockCount }}</strong> products have low
-        stock!
-      </div>
+      Add New Product
+    </button>
+    <button
+      @click="showAllProduct = true"
+      class="w-full sm:w-auto bg-zinc-500 text-white py-2 px-4 rounded-lg shadow-md mb-4 sm:mb-0"
+    >
+      View All Product
+    </button>
+    <button
+      @click="exportToCSV"
+      class="w-full sm:w-auto bg-blue-600 text-white py-2 px-4 text-sm rounded-lg shadow-md hover:bg-blue-800 mt-4 sm:mt-0 sm:ml-auto"
+    >
+      📥 Export Report as CSV
+    </button>
+  </div>
 
-      <div
-        v-if="totalInventoryValue > 0"
-        class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 px-4 py-3 rounded-lg m-4"
-      >
-        🏷️ <strong>Total Inventory Value:</strong> ₹
-        {{ totalInventoryValue.toFixed(2) }}
-      </div>
-      <div class="space-x-4">
-        <button
-          @click="addNewProduct = true"
-          class="w-full sm:w-auto bg-zinc-500 text-white py-2 px-4 rounded-lg shadow-md"
-        >
-          Add New Product
-        </button>
-
-        <button
-          @click="showAllProduct = true"
-          class="w-full sm:w-auto bg-zinc-500 text-white py-2 px-4 rounded-lg shadow-md"
-        >
-          View All Product
-        </button>
-        <button
-          @click="exportToCSV"
-          class="bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-800 mt-4 ml-[33rem]"
-        >
-          📥 Export Report as CSV
-        </button>
-      </div>
-      <div class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6">
-        <h3 class="text-2xl font-semibold text-indigo-700 mb-4">
-          Stock Levels by Category
-        </h3>
-
-        <Bar v-if="chartData" :data="chartData" :options="chartOptions" />
-
-        <p v-else class="text-gray-500">Loading data...</p>
-      </div>
+  <div class="flex flex-col sm:flex-row space-y-6 sm:space-y-0 sm:space-x-6 mt-6">
+    <!-- Stock Levels by Category Chart -->
+    <div class="w-full sm:w-1/2 p-4 bg-white shadow-lg rounded-lg">
+      <h3 class="text-xl font-semibold text-indigo-700 mb-4">
+        Stock Levels by Category
+      </h3>
+      <Bar v-if="chartData" :data="chartData" :options="chartOptions" />
+      <p v-else class="text-gray-500">Loading data...</p>
     </div>
+
+    <!-- Product-Wise Monthly Stock Updates Chart -->
+    <div class="w-full sm:w-1/2 p-4 bg-white shadow-lg rounded-lg">
+      <h3 class="text-xl font-semibold text-indigo-700 mb-4">
+        Product-Wise Monthly Stock Updates
+      </h3>
+      <Bar
+        v-if="productStockChartData"
+        :data="productStockChartData"
+        :options="chartOptionsss"
+      />
+      <p v-else class="text-gray-500">Loading data...</p>
+    </div>
+  </div>
+
+  <!-- Product Stock Updates Table -->
+  <div class="w-full mt-6 p-4 bg-white shadow-lg rounded-lg">
+    <div class="overflow-x-auto sm:overflow-x-visible">
+      <table class="min-w-full table-auto border-collapse border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2 text-sm text-gray-600">Product</th>
+            <th class="border border-gray-300 px-4 py-2 text-sm text-gray-600">Month</th>
+            <th class="border border-gray-300 px-4 py-2 text-sm text-gray-600">Restocked</th>
+            <th class="border border-gray-300 px-4 py-2 text-sm text-gray-600">Sold</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(update, index) in productStockUpdates" :key="index">
+            <td class="border border-gray-300 px-4 py-2 text-sm">{{ update.product }}</td>
+            <td class="border border-gray-300 px-4 py-2 text-sm">{{ update.month }}</td>
+            <td class="border border-gray-300 px-4 py-2 text-sm text-green-600 font-bold">
+              {{ update.restocked }}
+            </td>
+            <td class="border border-gray-300 px-4 py-2 text-sm text-red-600 font-bold">
+              {{ update.sold }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 
     <div
       v-if="addNewProduct"
@@ -276,56 +310,6 @@
       </form>
     </div>
     <!-- 📌 Product-Wise Monthly Stock Updates -->
-    <div 
-    v-if="user?.role === 'Viewer'"
-    class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6">
-      <h3 class="text-2xl font-semibold text-indigo-700 mb-4">
-        Product-Wise Monthly Stock Updates
-        <button
-          @click="exportToCSV"
-          class="bg-blue-600 text-white py-2 px-4 text-sm rounded-lg shadow-md hover:bg-blue-800 mt-4 ml-[30rem]"
-        >
-          📥 Export Report as CSV
-        </button>
-      </h3>
-      <!-- 📌 Export Button for Product-Wise Monthly Stock Report -->
-      
-
-      <!-- 📌 Table for Product-Wise Monthly Data -->
-      <table class="w-full table-auto border-collapse border border-gray-300">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="border border-gray-300 px-4 py-2">Product</th>
-            <th class="border border-gray-300 px-4 py-2">Month</th>
-            <th class="border border-gray-300 px-4 py-2">Restocked</th>
-            <th class="border border-gray-300 px-4 py-2">Sold</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(update, index) in productStockUpdates" :key="index">
-            <td class="border border-gray-300 px-4 py-2">
-              {{ update.product }}
-            </td>
-            <td class="border border-gray-300 px-4 py-2">{{ update.month }}</td>
-            <td
-              class="border border-gray-300 px-4 py-2 text-green-600 font-bold"
-            >
-              {{ update.restocked }}
-            </td>
-            <td class="border border-gray-300 px-4 py-2 text-red-600 font-bold">
-              {{ update.sold }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- 📌 Chart for Product-Wise Monthly Data -->
-      <Bar
-        v-if="productStockChartData"
-        :data="productStockChartData"
-        :options="chartOptionsss"
-      />
-    </div>
 
     <!-- Edit Product Modal -->
     <div
@@ -335,120 +319,124 @@
       <h3 class="text-2xl font-semibold text-indigo-700 mb-4">Edit Product</h3>
       <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-6">
         <form @submit.prevent="handleEditProductSubmit()" class="space-y-4">
-        <div>
-          <label for="editName" class="block text-sm font-medium text-gray-700"
-            >Name</label
-          >
-          <input
-            v-model="selectedProduct.name"
-            type="text"
-            id="editName"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
+          <div>
+            <label
+              for="editName"
+              class="block text-sm font-medium text-gray-700"
+              >Name</label
+            >
+            <input
+              v-model="selectedProduct.name"
+              type="text"
+              id="editName"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
+            />
+          </div>
 
-        <div>
-          <label
-            for="editQuantity"
-            class="block text-sm font-medium text-gray-700"
-            >Quantity</label
-          >
-          <input
-            v-model.number="selectedProduct.quantity"
-            type="number"
-            id="editQuantity"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
+          <div>
+            <label
+              for="editQuantity"
+              class="block text-sm font-medium text-gray-700"
+              >Quantity</label
+            >
+            <input
+              v-model.number="selectedProduct.quantity"
+              type="number"
+              id="editQuantity"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div>
-          <label for="editPrice" class="block text-sm font-medium text-gray-700"
-            >Price</label
-          >
-          <input
-            v-model.number="selectedProduct.price"
-            type="number"
-            id="editPrice"
-            step="0.01"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
+          <div>
+            <label
+              for="editPrice"
+              class="block text-sm font-medium text-gray-700"
+              >Price</label
+            >
+            <input
+              v-model.number="selectedProduct.price"
+              type="number"
+              id="editPrice"
+              step="0.01"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div>
-          <label
-            for="editSupplier"
-            class="block text-sm font-medium text-gray-700"
-            >Supplier</label
-          >
-          <input
-            v-model="selectedProduct.supplier"
-            type="text"
-            id="editSupplier"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
+          <div>
+            <label
+              for="editSupplier"
+              class="block text-sm font-medium text-gray-700"
+              >Supplier</label
+            >
+            <input
+              v-model="selectedProduct.supplier"
+              type="text"
+              id="editSupplier"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <!-- Restock Quantity Field -->
-        <div>
-          <label for="restock" class="block text-sm font-medium text-gray-700"
-            >Restock Quantity</label
-          >
-          <input
-            v-model.number="selectedProduct.restocked"
-            type="number"
-            id="restock"
-            placeholder="Enter Restock Quantity"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
+          <!-- Restock Quantity Field -->
+          <div>
+            <label for="restock" class="block text-sm font-medium text-gray-700"
+              >Restock Quantity</label
+            >
+            <input
+              v-model.number="selectedProduct.restocked"
+              type="number"
+              id="restock"
+              placeholder="Enter Restock Quantity"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <!-- Sold Quantity Field -->
-        <div>
-          <label for="sold" class="block text-sm font-medium text-gray-700"
-            >Sold Quantity</label
-          >
-          <input
-            v-model.number="selectedProduct.sold"
-            type="number"
-            id="sold"
-            placeholder="Enter Sold Quantity"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
+          <!-- Sold Quantity Field -->
+          <div>
+            <label for="sold" class="block text-sm font-medium text-gray-700"
+              >Sold Quantity</label
+            >
+            <input
+              v-model.number="selectedProduct.sold"
+              type="number"
+              id="sold"
+              placeholder="Enter Sold Quantity"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div>
-          <label
-            for="editStatus"
-            class="block text-sm font-medium text-gray-700"
-            >Status</label
-          >
-          <select
-            v-model="selectedProduct.status"
-            id="editStatus"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+          <div>
+            <label
+              for="editStatus"
+              class="block text-sm font-medium text-gray-700"
+              >Status</label
+            >
+            <select
+              v-model="selectedProduct.status"
+              id="editStatus"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
 
-        <div class="flex justify-end space-x-4">
-          <button
-            type="submit"
-            class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-800"
-          >
-            Save Changes
-          </button>
-          <button
-            type="button"
-            @click="selectedProduct = null"
-            class="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-800"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+          <div class="flex justify-end space-x-4">
+            <button
+              type="submit"
+              class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-800"
+            >
+              Save Changes
+            </button>
+            <button
+              type="button"
+              @click="selectedProduct = null"
+              class="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-800"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -457,102 +445,164 @@
       class="w-full max-w-6xl bg-white shadow-lg rounded-lg p-6 mt-6"
     >
       <h3 class="text-2xl font-semibold text-indigo-700">All Products</h3>
-      <table class="min-w-full divide-y divide-gray-200 mr-4">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Name
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              SKU
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Category
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Quantity
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Price
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Supplier
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Status
-            </th>
-            <th scope="col" class="relative px-6 py-3">
-              <span class="sr-only">Actions</span>
-            </th>
-          </tr>
-        </thead>
 
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr
-            v-for="(product, index) in products"
-            :key="index"
-            :class="{ 'bg-red-200': product.isLowStock }"
-          >
-            <td class="px-6 py-4 whitespace-nowrap">{{ product.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ product.sku }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ product.category }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ product.quantity }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              ₹ {{ product.price.toFixed(2) }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ product.supplier }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                :class="[
-                  product.status === 'active'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800',
-                  'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                ]"
-              >
-                {{ product.status }}
-              </span>
-            </td>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2"
+      <div class="md:hidden">
+        <!-- Mobile View: Display products as cards -->
+        <div
+          v-for="(product, index) in products"
+          :key="index"
+          class="bg-white shadow-lg rounded-lg p-4 mb-4"
+        >
+          <div class="font-semibold text-lg text-indigo-700">
+            {{ product.name }}
+          </div>
+          <div class="text-sm text-gray-600">SKU: {{ product.sku }}</div>
+          <div class="text-sm text-gray-600">
+            Category: {{ product.category }}
+          </div>
+          <div class="text-sm text-gray-600">
+            Quantity: {{ product.quantity }}
+          </div>
+          <div class="text-sm text-gray-600">
+            Price: ₹ {{ product.price.toFixed(2) }}
+          </div>
+          <div class="text-sm text-gray-600">
+            Supplier: {{ product.supplier }}
+          </div>
+          <div>
+            <span
+              :class="[
+                product.status === 'active'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800',
+                'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+              ]"
             >
-              <button
-                @click="editProduct(product)"
-                class="text-indigo-600 hover:text-indigo-900"
+              {{ product.status }}
+            </span>
+          </div>
+          <div class="mt-2">
+            <button
+              @click="editProduct(product)"
+              class="text-indigo-600 hover:text-indigo-900 mr-2"
+            >
+              Edit
+            </button>
+            <button
+              @click="deleteProduct(product._id || product.id)"
+              class="text-red-600 hover:text-red-900"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop View: Regular Table -->
+      <div class="hidden md:block">
+        <table class="min-w-full divide-y divide-gray-200 mr-4">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                Edit
-              </button>
-              <button
-                @click="deleteProduct(product._id || product.id)"
-                class="text-red-600 hover:text-red-900"
+                Name
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                SKU
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Category
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Quantity
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Price
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Supplier
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Status
+              </th>
+              <th scope="col" class="relative px-6 py-3">
+                <span class="sr-only">Actions</span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr
+              v-for="(product, index) in products"
+              :key="index"
+              :class="{ 'bg-red-200': product.isLowStock }"
+            >
+              <td class="px-6 py-4 whitespace-nowrap">{{ product.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ product.sku }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {{ product.category }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {{ product.quantity }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                ₹ {{ product.price.toFixed(2) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {{ product.supplier }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  :class="[
+                    product.status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800',
+                    'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                  ]"
+                >
+                  {{ product.status }}
+                </span>
+              </td>
+              <td
+                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2"
+              >
+                <button
+                  @click="editProduct(product)"
+                  class="text-indigo-600 hover:text-indigo-900"
+                >
+                  Edit
+                </button>
+                <button
+                  @click="deleteProduct(product._id || product.id)"
+                  class="text-red-600 hover:text-red-900"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -601,13 +651,16 @@ const handleNewProductSubmit = async () => {
   try {
     console.log("Submitting product:", product);
 
-    const response = await fetch("https://inventory-management-backend-yvvk.onrender.com/api/products", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(product),
-    });
+    const response = await fetch(
+      "https://inventory-management-backend-yvvk.onrender.com/api/products",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
+      }
+    );
 
     const data = await response.json();
 
@@ -629,7 +682,9 @@ const totalInventoryValue = ref(0); // New state for inventory value
 
 const fetchProducts = async () => {
   try {
-    const response = await fetch("https://inventory-management-backend-yvvk.onrender.com/api/products");
+    const response = await fetch(
+      "https://inventory-management-backend-yvvk.onrender.com/api/products"
+    );
     const data = await response.json();
 
     if (response.ok) {
@@ -821,7 +876,9 @@ const stockByCategory = ref([]);
 
 const fetchStockByCategory = async () => {
   try {
-    const response = await fetch("https://inventory-management-backend-yvvk.onrender.com/api/stock-by-category");
+    const response = await fetch(
+      "https://inventory-management-backend-yvvk.onrender.com/api/stock-by-category"
+    );
     const data = await response.json();
     stockByCategory.value = data;
   } catch (error) {
