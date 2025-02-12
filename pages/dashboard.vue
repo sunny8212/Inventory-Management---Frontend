@@ -8,12 +8,13 @@
     Role: {{ user?.role }}
   </span>
 
-  <div class="relative p-6 max-w-7xl mx-auto">
-    <!-- Logout Button -->
+  <div class="p-6 flex flex-col items-center bg-zinc-400">
+    
+    <!-- ✅ Logout Button: Always Top Right Across All Devices -->
     <NuxtLink
       to="/"
       @click.prevent="handleLogout"
-      class="absolute bottom-20 sm:top-6 sm:right-6 h-8 w-18 flex justify-center items-center bg-red-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-300 transition"
+      class="fixed top-4 right-4 sm:top-6 sm:right-6 bg-red-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-400 transition"
     >
       Logout
     </NuxtLink>
@@ -604,6 +605,64 @@
         </table>
       </div>
     </div>
+    <footer class="w-full bg-zinc-800 text-white mt-12">
+    <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between">
+      <!-- Left Section: Logo & Description -->
+      <div class="mb-6 sm:mb-0">
+        <h2 class="text-xl font-bold text-indigo-400">My Inventory</h2>
+        <p class="text-gray-300 text-sm mt-2 max-w-[15rem]">
+          Manage your inventory seamlessly with MyInventory. Track stock, sales, and reports all in one place.
+        </p>
+      </div>
+
+      <!-- Middle Section: Quick Links -->
+      <div class="flex flex-col sm:flex-row gap-6 sm:gap-12">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-300">Quick Links</h3>
+          <ul class="mt-3 space-y-2 text-gray-400 text-sm">
+            <li><NuxtLink to="/" class="hover:text-indigo-400 transition">Home</NuxtLink></li>
+            <li><NuxtLink to="/dashboard" class="hover:text-indigo-400 transition">Dashboard</NuxtLink></li>
+            <li><NuxtLink to="/products" class="hover:text-indigo-400 transition">Products</NuxtLink></li>
+            <li><NuxtLink to="/reports" class="hover:text-indigo-400 transition">Reports</NuxtLink></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-gray-300">Support</h3>
+          <ul class="mt-3 space-y-2 text-gray-400 text-sm">
+            <li><NuxtLink to="/faq" class="hover:text-indigo-400 transition">FAQ</NuxtLink></li>
+            <li><NuxtLink to="/contact" class="hover:text-indigo-400 transition">Contact Us</NuxtLink></li>
+            <li><NuxtLink to="/privacy" class="hover:text-indigo-400 transition">Privacy Policy</NuxtLink></li>
+            <li><NuxtLink to="/terms" class="hover:text-indigo-400 transition">Terms of Service</NuxtLink></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right Section: Social Media -->
+      <div class="flex flex-col">
+        <h3 class="text-lg font-semibold text-gray-300">Follow Us</h3>
+        <div class="flex mt-3 space-x-4">
+          <a href="https://facebook.com" target="_blank" class="text-gray-400 hover:text-blue-500 transition">
+            <i class="fab fa-facebook text-2xl"></i>
+          </a>
+          <a href="https://twitter.com" target="_blank" class="text-gray-400 hover:text-blue-400 transition">
+            <i class="fab fa-twitter text-2xl"></i>
+          </a>
+          <a href="https://linkedin.com" target="_blank" class="text-gray-400 hover:text-blue-700 transition">
+            <i class="fab fa-linkedin text-2xl"></i>
+          </a>
+          <a href="https://instagram.com" target="_blank" class="text-gray-400 hover:text-pink-500 transition">
+            <i class="fab fa-instagram text-2xl"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Copyright Section -->
+    <div class="border-t border-gray-600 mt-6 py-4 text-center text-gray-400 text-sm">
+      © {{ new Date().getFullYear() }} MyInventory. All rights reserved.
+    </div>
+  </footer>
   </div>
 </template>
 
